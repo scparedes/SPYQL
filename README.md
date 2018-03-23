@@ -1,5 +1,5 @@
 # SPYQL
-Custom library for SQL-like queries with light input validation and basic support for the addition operator.
+Custom library for handling SQL-like queries with light input validation and basic support for the addition operator.
 
 ## Working with SPYQL
 The way SPYQL works is by chunking the highest level pre-defined components of a SQL query (SELECT, FROM, WHERE, etc.) into attributes of a SPYQL SQL object.
