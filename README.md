@@ -12,10 +12,13 @@ The way SPYQL works is by chunking the highest level pre-defined components of a
 ...
 >>> sql._select
 <spyql.SQLSelect object at 0x100d29750>
+...
 >>> sql._select.as_string
 'SELECT a.*, b.*'
+...
 >>> sql._from
 <spyql.SQLFrom object at 0x100d29850>
+...
 >>> sql._from.as_string
 'FROM apples a inner join bananas b using (a,b)'
 ...
@@ -23,7 +26,7 @@ The way SPYQL works is by chunking the highest level pre-defined components of a
 'SELECT a.*, b.* FROM apples a inner join bananas b using (a,b) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15'
 ```
 ### Component Addition
-You can use SPYQL to build compound queries.  Say, for instance, you had a base query and you wanted to add some constraints:
+You can use SPYQL to build compound queries by actually adding them together.  Say, for instance, you had a base query and you wanted to add some constraints:
 ```python
 from spyql import SQL, SQLWhere, SQLLimit
 
