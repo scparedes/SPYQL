@@ -38,6 +38,10 @@ class TestSql(unittest.TestCase):
         self.assertEqual(sql.as_string, 'SELECT a, c FROM b, d')
         sql += SQLWhere('a > c')
         self.assertEqual(sql.as_string, 'SELECT a, c FROM b, d WHERE a > c')
+        
+        query_with_nests = 'select k from (select k from ztab left outer join ytab using (date)) tabk where k in (select k from ytab where k > 5)'
+        sql += SQL.from_string(query_with_nests)
+        self.assertEqual(sql.as_string, 'SELECT a, c, k FROM b, d, (select k from ztab left outer join ytab using (date)) tabk WHERE a > c and k in (select k from ytab where k > 5)')
 
     def test__sql_component__init(self):
         import spyql
