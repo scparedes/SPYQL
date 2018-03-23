@@ -1,25 +1,6 @@
 import unittest
 from spyql import get_upper_cased_component_value, joins as sql_joins
 
-def must_receive_string_as_input(testobj, SQLClass):
-    must_receive_as_input(testobj, SQLClass, 'test', 5)
-
-def must_receive_int_as_input(testobj, SQLClass):
-    must_receive_as_input(testobj, SQLClass, 5, 'test')
-
-def must_receive_as_input(testobj, SQLClass, _input, _counter_input):
-    with testobj.assertRaises(ValueError):
-        sql_class_instance = SQLClass(_counter_input)
-    sql_class_instance = SQLClass(_input)
-    testobj.assertEqual(sql_class_instance.value, _input)
-
-def sql_class_instance_as_string_has_uppered_class_type(testobj, SQLClass, value):
-    upped_value = get_upper_cased_component_value(value, SQLClass.component_name)
-    value_missing_component = value.replace(SQLClass.component_name.lower()+' ', '')
-    testobj.assertEqual(SQLClass(value).as_string, upped_value)
-    testobj.assertEqual(SQLClass(upped_value).as_string, upped_value)
-    testobj.assertEqual(SQLClass(value_missing_component).as_string, upped_value)
-
 class TestSql(unittest.TestCase):
     maxDiff = None
 
@@ -27,7 +8,7 @@ class TestSql(unittest.TestCase):
         from spyql import SQL
         sql = SQL.from_string('select a.*, b.* from apples a inner join bananas b using (c,d) where length(a.y) != length(b.z) and length(a.y) > 2 group by a.y having count(a.y)<5 order by b.z limit 15')
         self.assertEqual(sql.as_string, 'SELECT a.*, b.* FROM apples a inner join bananas b using (c,d) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15')
-        sql = SQL.from_string('select test from other;') # testing semi colons
+        sql = SQL.from_string('select test from other;') # testing the processing of semi colons
         self.assertEqual(sql.as_string, 'SELECT test FROM other')
 
     def test__sql__add(self):
@@ -38,24 +19,11 @@ class TestSql(unittest.TestCase):
         self.assertEqual(sql.as_string, 'SELECT a, c FROM b, d')
         sql += SQLWhere('a > c')
         self.assertEqual(sql.as_string, 'SELECT a, c FROM b, d WHERE a > c')
-        
+
         query_with_nests = 'select k from (select k from ztab left outer join ytab using (date)) tabk where k in (select k from ytab where k > 5)'
         sql += SQL.from_string(query_with_nests)
         self.assertEqual(sql.as_string, 'SELECT a, c, k FROM b, d, (select k from ztab left outer join ytab using (date)) tabk WHERE a > c and k in (select k from ytab where k > 5)')
 
-    def test__sql_component__init(self):
-        import spyql
-        def test_sql_component_works_if_expected_type_returns_a_type():
-            spyql.SQLComponent.expected_type = property(lambda x: int)
-            sql_component = spyql.SQLComponent(5)
-            self.assertEqual(sql_component.value, 5)
-        test_sql_component_works_if_expected_type_returns_a_type()
-
-        def test_default_sql_component_cannot_be_instantiated():
-            reload(spyql)
-            with self.assertRaises(NotImplementedError):
-                sql_component = spyql.SQLComponent(5)
-        test_default_sql_component_cannot_be_instantiated()
 
     def test__sql_select__init(self):
         from spyql import SQLSelect
@@ -76,6 +44,7 @@ class TestSql(unittest.TestCase):
 
         sql_select += 'test4'
         self.assertEqual(sql_select.value, 'SELECT test1, test2, test3, test4')
+
 
     def test__sql_from__init(self):
         from spyql import SQLFrom
@@ -104,6 +73,7 @@ class TestSql(unittest.TestCase):
             query += ' %s' % addendum
             self.assertEqual(sql_from.value, query)
 
+
     def test__sql_where__init(self):
         from spyql import SQLWhere
         must_receive_string_as_input(self, SQLWhere)
@@ -126,6 +96,7 @@ class TestSql(unittest.TestCase):
 
         sql_where += 'test4 = true'
         self.assertEqual(sql_where.value, 'WHERE a.w = b.x and a.y = b.z and test1 > test2 and test4 = true')
+
 
     def test__sql_group_by__init(self):
         from spyql import SQLGroupBy
@@ -174,6 +145,7 @@ class TestSql(unittest.TestCase):
         sql_having += 'test4 = true'
         self.assertEqual(sql_having.value, 'HAVING a.w = b.x and a.y = b.z and test1 > test2 and test4 = true')
 
+
     def test__sql_order_by__init(self):
         from spyql import SQLOrderBy
         must_receive_string_as_input(self, SQLOrderBy)
@@ -221,6 +193,22 @@ class TestSql(unittest.TestCase):
         with self.assertRaises(ValueError):
             sql_limit_by += SQLLimit(60)
 
+
+    def test__sql_component__init(self):
+        import spyql
+        def test_sql_component_works_if_expected_type_returns_a_type():
+            spyql.SQLComponent.expected_type = property(lambda x: int)
+            sql_component = spyql.SQLComponent(5)
+            self.assertEqual(sql_component.value, 5)
+        test_sql_component_works_if_expected_type_returns_a_type()
+
+        def test_default_sql_component_cannot_be_instantiated():
+            reload(spyql)
+            with self.assertRaises(NotImplementedError):
+                sql_component = spyql.SQLComponent(5)
+        test_default_sql_component_cannot_be_instantiated()
+
+
     def test__tokenize_sql_component(self):
         from spyql import tokenize_sql_component
         q0 = tokenize_sql_component('')
@@ -247,6 +235,27 @@ class TestSql(unittest.TestCase):
         """
         q = tokenize_sql_component(multiline_statement)
         self.assertEqual(q, ['field1, field2', 'table1', "field1 IREGEXP '([0-9] ){15}' or field1 IREGEXP '^.*special information .*  [0-9].*' or '^.*also special info .*  [0-9].*'         and specific > '2018-01-01'", '', '', '', ''])
+
+
+def must_receive_string_as_input(testobj, SQLClass):
+    must_receive_as_input(testobj, SQLClass, 'test', 5)
+
+def must_receive_int_as_input(testobj, SQLClass):
+    must_receive_as_input(testobj, SQLClass, 5, 'test')
+
+def must_receive_as_input(testobj, SQLClass, _input, _counter_input):
+    with testobj.assertRaises(ValueError):
+        sql_class_instance = SQLClass(_counter_input)
+    sql_class_instance = SQLClass(_input)
+    testobj.assertEqual(sql_class_instance.value, _input)
+
+def sql_class_instance_as_string_has_uppered_class_type(testobj, SQLClass, value):
+    upped_value = get_upper_cased_component_value(value, SQLClass.component_name)
+    value_missing_component = value.replace(SQLClass.component_name.lower()+' ', '')
+    testobj.assertEqual(SQLClass(value).as_string, upped_value)
+    testobj.assertEqual(SQLClass(upped_value).as_string, upped_value)
+    testobj.assertEqual(SQLClass(value_missing_component).as_string, upped_value)
+
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
