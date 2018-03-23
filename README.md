@@ -83,5 +83,7 @@ print sql.as_string
 ## Why SPYQL?
 I made SPYQL to pull myself out of the mire of low-level string manipulation for building SQL-like queries.  Instead I wanted to deal with a more robust OOP-inspired interface.  I'll be updating SPYQL as needs demand and time allows.
 
+Oh, and the name? SP for my initials, PY for python, QL for paying respects to SQL, i.e. pronounced spy-quill or spy-queue-ell.
+
 ## The Gritty Details
 For fuller understanding of current capabilities/limitations, I recommend referring to the unit tests in `test_spyql.py` and `spyql.py` itself.
