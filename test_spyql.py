@@ -25,9 +25,8 @@ class TestSql(unittest.TestCase):
 
     def test__sql__init(self):
         from spyql import SQL
-        sql = SQL.from_string('select a.*, b.* from apples a inner join bananas b using (a,b) where length(a.y) != length(b.z) and length(a.y) > 2 group by a.y having count(a.y)<5 order by b.z limit 15')
-        import pdb; pdb.set_trace()
-        self.assertEqual(sql.as_string, 'SELECT a.*, b.* FROM apples a inner join bananas b using (a,b) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15')
+        sql = SQL.from_string('select a.*, b.* from apples a inner join bananas b using (c,d) where length(a.y) != length(b.z) and length(a.y) > 2 group by a.y having count(a.y)<5 order by b.z limit 15')
+        self.assertEqual(sql.as_string, 'SELECT a.*, b.* FROM apples a inner join bananas b using (c,d) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15')
         sql = SQL.from_string('select test from other;') # testing semi colons
         self.assertEqual(sql.as_string, 'SELECT test FROM other')
 
