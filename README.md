@@ -19,7 +19,7 @@ Each component can be individually converted into a string:
 >>> sql._from.as_string
 'FROM apples a inner join bananas b using (a,b)'
 ```
-All the components can be retrieved at once and formatted at the highest level too:
+All components can be collectively converted into a string and formatted too:
 ```python
 >>> sql.as_string
 'SELECT a.*, b.* FROM apples a inner join bananas b using (a,b) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15'
