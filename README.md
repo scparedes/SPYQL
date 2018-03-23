@@ -24,7 +24,7 @@ All components can be collectively converted into a string and formatted too:
 >>> sql.as_string
 'SELECT a.*, b.* FROM apples a inner join bananas b using (a,b) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15'
 ```
-### Component Addition
+### SQL Addition
 You can use SPYQL to build complex queries by adding SQL objects together:
 ```python
 from spyql import SQL, SQLWhere
@@ -45,7 +45,7 @@ sql += SQL.from_string(query_with_nests)
 assert sql.as_string, 'SELECT a, c, k FROM b, d, (select k from ztab left outer join ytab using (date)) tabk WHERE a > c and k in (select k from ytab where k > 5)'
 ```
 #### More on that...
-Here's a demo of repeatedly adding smaller constraints and entire SQL objects to `specific_sql` (with intermediate states being printed along the way):
+Here's a demo of repeatedly adding smaller constraints and entire SQL objects to `sql` (with intermediate states being printed along the way):
 ```python
 from spyql import SQL, SQLWhere, SQLLimit, SQLGroupBy, SQLHaving, SQLFrom
 
