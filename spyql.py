@@ -1,4 +1,4 @@
-"""Custom library for SQL-like queries with light input validation and basic support for the addition operator.
+"""A library for handling SQL-like queries with light input validation and basic arithmetic support for combining queries.
 """
 
 joins = ['inner join', 'left outer join']
