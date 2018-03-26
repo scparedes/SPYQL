@@ -236,6 +236,25 @@ class TestSql(unittest.TestCase):
         q = tokenize_sql_component(multiline_statement)
         self.assertEqual(q, ['field1, field2', 'table1', "field1 IREGEXP '([0-9] ){15}' or field1 IREGEXP '^.*special information .*  [0-9].*' or '^.*also special info .*  [0-9].*'         and specific > '2018-01-01'", '', '', '', ''])
 
+    def test__str_method_returns_query(self):
+        from spyql import SQL, SQLSelect, SQLFrom, SQLWhere, SQLGroupBy, SQLHaving, SQLOrderBy, SQLLimit
+
+        sql = SQL.from_string('SELECT test FROM other')
+        self.assertEqual(str(sql), 'SELECT test FROM other')
+        sql_select = SQLSelect('SELECT test1')
+        self.assertEqual(str(sql_select), 'SELECT test1')
+        sql_from = SQLFrom('FROM test1 as t1')
+        self.assertEqual(str(sql_from), 'FROM test1 as t1')
+        sql_where = SQLWhere('WHERE a.w = b.x')
+        self.assertEqual(str(sql_where), 'WHERE a.w = b.x')
+        sql_group_by = SQLGroupBy('GROUP BY a.a')
+        self.assertEqual(str(sql_group_by), 'GROUP BY a.a')
+        sql_having = SQLHaving('HAVING a.w = b.x')
+        self.assertEqual(str(sql_having), 'HAVING a.w = b.x')
+        sql_order_by = SQLOrderBy('ORDER BY a.a')
+        self.assertEqual(str(sql_order_by), 'ORDER BY a.a')
+        sql_limit_by = SQLLimit(50)
+        self.assertEqual(str(sql_limit_by), 'LIMIT 50')
 
 def must_receive_string_as_input(testobj, SQLClass):
     must_receive_as_input(testobj, SQLClass, 'test', 5)

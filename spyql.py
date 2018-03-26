@@ -49,6 +49,9 @@ class SQLComponent(object):
             raise ValueError('Cannot produce %s from %s' % (self.__class__.__name__, type(other).__name__))
         return self
 
+    def __str__(self):
+        return self.as_string
+
 class SQLSelect(SQLComponent):
     component_name = 'SELECT'
     def __init__(self, value):
@@ -233,6 +236,9 @@ class SQL(object):
                     value += other
                     break
         return self
+
+    def __str__(self):
+        return self.as_string
 
 def tokenize_sql_component(statement):
     component_names = {

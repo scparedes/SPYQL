@@ -14,14 +14,14 @@ The way SPYQL works is by chunking the highest level pre-defined components of a
 ```
 Each component can be individually converted into a string:
 ```python
->>> sql._select.as_string
+>>> str(sql._select)
 'SELECT a.*, b.*'
->>> sql._from.as_string
+>>> str(sql._from)
 'FROM apples a inner join bananas b using (a,b)'
 ```
 All components can be collectively converted into a string and formatted too:
 ```python
->>> sql.as_string
+>>> str(sql)
 'SELECT a.*, b.* FROM apples a inner join bananas b using (a,b) WHERE length(a.y) != length(b.z) and length(a.y) > 2 GROUP BY a.y HAVING count(a.y)<5 ORDER BY b.z LIMIT 15'
 ```
 ### SQL Addition
@@ -30,19 +30,19 @@ You can use SPYQL to build complex queries by adding SQL objects together:
 from spyql import SQL, SQLWhere
 
 sql = SQL.from_string('SELECT a FROM b')
-assert sql.as_string == 'SELECT a FROM b'
+assert str(sql) == 'SELECT a FROM b'
 
 sql += SQL.from_string('SELECT c FROM d')
-assert sql.as_string == 'SELECT a, c FROM b, d'
+assert str(sql) == 'SELECT a, c FROM b, d'
 
 sql += SQLWhere('a > c')
-assert sql.as_string == 'SELECT a, c FROM b, d WHERE a > c'
+assert str(sql) == 'SELECT a, c FROM b, d WHERE a > c'
 ```
 SPYQL can handle compound/sub-queries too:
 ```python
 query_with_nests = 'select k from (select k from ztab left outer join ytab using (date)) tabk where k in (select k from ytab where k > 5)'
 sql += SQL.from_string(query_with_nests)
-assert sql.as_string, 'SELECT a, c, k FROM b, d, (select k from ztab left outer join ytab using (date)) tabk WHERE a > c and k in (select k from ytab where k > 5)'
+assert str(sql), 'SELECT a, c, k FROM b, d, (select k from ztab left outer join ytab using (date)) tabk WHERE a > c and k in (select k from ytab where k > 5)'
 ```
 #### More on that...
 Here's a demo of repeatedly adding smaller constraints and entire SQL objects to `sql` (with intermediate states being printed along the way):
@@ -51,32 +51,32 @@ from spyql import SQL, SQLWhere, SQLLimit, SQLGroupBy, SQLHaving, SQLFrom
 
 unaltered_sql = SQL.from_string('SELECT a FROM b')
 sql = unaltered_sql + SQLWhere("date >= '2018-01-01'") + SQLLimit(100)
-print sql.as_string
+print sql
 # SELECT a FROM b WHERE date >= '2018-01-01' LIMIT 100
 
 sql += SQL.from_string('SELECT c FROM d')
-print sql.as_string
+print sql
 # SELECT a, c FROM b, d WHERE date >= '2018-01-01' LIMIT 100
 
 sql += SQLGroupBy('a, c')
-print sql.as_string
+print sql
 # SELECT a, c FROM b, d WHERE date >= '2018-01-01' GROUP BY a, c LIMIT 100
 
 sql += SQLHaving('a > 1')
-print sql.as_string
+print sql
 # SELECT a, c FROM b, d WHERE date >= '2018-01-01' GROUP BY a, c HAVING a > 1 LIMIT 100
 
 sql += SQLHaving('a < 5')
-print sql.as_string
+print sql
 # SELECT a, c FROM b, d WHERE date >= '2018-01-01' GROUP BY a, c HAVING a > 1 and a < 5 LIMIT 100
 
 sql += SQLFrom('e ex')
 sql += SQLFrom('from f') # <---- leading 'from' will be stripped from SQL object to circumvent syntactic/semantic issues (all components are handled similarly)
-print sql.as_string
+print sql
 # SELECT a, c FROM b, d, e ex, f WHERE date >= '2018-01-01' GROUP BY a, c HAVING a > 1 and a < 5 LIMIT 100
 
 sql += SQLFrom('INNER JOIN test t USING (common_attribute)')
-print sql.as_string
+print sql
 # SELECT a, c FROM b, d, e ex, f INNER JOIN test t USING (common_attribute) WHERE date >= '2018-01-01' GROUP BY a, c HAVING a > 1 and a < 5 LIMIT 100
 ```
 
